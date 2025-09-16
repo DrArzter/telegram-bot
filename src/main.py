@@ -7,7 +7,9 @@ from aiogram.enums import ParseMode
 
 from dotenv import load_dotenv
 
+from middlewares import include_middlewares
 from handlers import include_routers
+
 from utils.set_commands import set_commands
 from utils.logger import get_logger
 
@@ -24,6 +26,7 @@ if not TOKEN:
 # Initialize dispatcher
 dp = Dispatcher()
 include_routers(dp)
+include_middlewares(dp)
 
 
 async def on_startup(bot: Bot) -> None:
