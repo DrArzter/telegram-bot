@@ -7,7 +7,7 @@ from aiogram.enums import ParseMode
 
 from dotenv import load_dotenv
 
-from utils.handlers import include_routers
+from handlers import include_routers
 from utils.set_commands import set_commands
 from utils.logger import get_logger
 
