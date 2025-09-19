@@ -1,3 +1,4 @@
+# handlers/__init__.py
 from typing import Optional
 from aiogram import Dispatcher
 import importlib

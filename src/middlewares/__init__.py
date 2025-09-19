@@ -1,3 +1,4 @@
+# middlewares/__init__.py
 from pathlib import Path
 import importlib
 from aiogram import Dispatcher
@@ -6,10 +7,9 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 def include_middlewares(
-    dp: Dispatcher,
-    path: Optional[Path] = None,
-    package: Optional[str] = None
+    dp: Dispatcher, path: Optional[Path] = None, package: Optional[str] = None
 ) -> None:
     """
     Recursively includes all middleware objects from middleware directory and subdirectories.
@@ -31,6 +31,10 @@ def include_middlewares(
                 mw = getattr(module, "middleware", None)
                 if mw is not None:
                     dp.update.middleware(mw)  # type: ignore
-                    logger.info(f"Middleware from {package}.{module_name} included successfully")
+                    logger.info(
+                        f"Middleware from {package}.{module_name} included successfully"
+                    )
             except Exception as e:
-                logger.exception(f"Failed to include middleware from {package}.{module_name}: {e}")
+                logger.exception(
+                    f"Failed to include middleware from {package}.{module_name}: {e}"
+                )

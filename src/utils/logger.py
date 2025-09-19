@@ -33,21 +33,22 @@ class FixedFormatter(logging.Formatter):
         record.shortname = (short[:12] + "...") if len(short) > 15 else short.ljust(15)
         record.levelname = f"{record.levelname:<8}"
 
-        # Add color if console output
         color = LEVEL_COLOR.get(record.levelname.strip(), "")
-        record.msg = f"{color}{record.getMessage()}{RESET_COLOR}" if color else record.getMessage()
+        record.msg = (
+            f"{color}{record.getMessage()}{RESET_COLOR}"
+            if color
+            else record.getMessage()
+        )
 
         return super().format(record)
 
 
 def get_logger(
-    name: str = __name__,
-    level: int = logging.INFO,
-    log_file: Path | str | None = None
+    name: str = __name__, level: int = logging.INFO, log_file: Path | str | None = None
 ) -> logging.Logger:
     """
     Returns a logger with both console and optional file logging.
-    
+
     :param name: Logger name
     :param level: Logging level
     :param log_file: Optional path to log file
@@ -58,7 +59,6 @@ def get_logger(
 
     logger.setLevel(level)
 
-    # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(
         FixedFormatter(
@@ -68,7 +68,6 @@ def get_logger(
     )
     logger.addHandler(console_handler)
 
-    # File handler
     if log_file:
         log_file = Path(log_file)
         log_file.parent.mkdir(parents=True, exist_ok=True)
