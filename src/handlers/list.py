@@ -1,9 +1,13 @@
 from aiogram import Router, F
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto, InputMediaAudio
+from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 from utils.storage import load_ads, like_ad, delete_ad, get_ad_by_id
-from utils.keyboards import get_ad_actions_keyboard, get_main_menu_keyboard
+from utils.keyboards import (
+    get_ad_actions_keyboard,
+    get_main_menu_keyboard,
+    get_ads_navigation_keyboard,
+)
 from utils.logger import get_logger
 from math import ceil
 
@@ -23,14 +27,6 @@ async def command_list_handler(message: Message) -> None:
 
 
 async def show_ads_page(message: Message, page: int = 1, user_id: int = None) -> None:
-    """
-    Shows advertisements page with pagination.
-
-    Args:
-        message: Message object
-        page: Page number to show
-        user_id: ID of the user requesting the ads (for proper keyboard generation)
-    """
     ads = load_ads()
 
     if not ads:
@@ -60,6 +56,9 @@ async def show_ads_page(message: Message, page: int = 1, user_id: int = None) ->
 
     for i, ad in enumerate(page_ads, start=start_idx + 1):
         await send_single_ad(message, ad, i, current_user_id)
+
+    nav_keyboard = get_ads_navigation_keyboard(page, total_pages)
+    await message.answer("📑 Navigation:", reply_markup=nav_keyboard)
 
 
 async def send_single_ad(
@@ -209,3 +208,25 @@ async def delete_ad_callback(callback: CallbackQuery) -> None:
             "❌ Failed to delete advertisement. You can only delete your own ads.",
             show_alert=True,
         )
+
+
+@router.callback_query(F.data == "current_page")
+async def current_page_callback(callback: CallbackQuery) -> None:
+    """
+    Handles current page button press (does nothing, just shows current page).
+    """
+    await callback.answer("You are currently viewing this page")
+
+
+@router.callback_query(F.data.startswith("page:"))
+async def page_navigation_callback(callback: CallbackQuery) -> None:
+    """
+    Handles page navigation button press.
+    """
+    page = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+
+    # Edit the original message to show new page
+    await callback.message.edit_text("Loading...")
+    await show_ads_page(callback.message, page=page, user_id=user_id)
+    await callback.answer()

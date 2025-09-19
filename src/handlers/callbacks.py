@@ -68,14 +68,6 @@ async def main_menu_callback(callback: CallbackQuery, state: FSMContext) -> None
     logger.info(f"Main menu accessed by user {callback.from_user.id}")
 
 
-@router.callback_query(F.data == "current_page")
-async def current_page_callback(callback: CallbackQuery) -> None:
-    """
-    Handles current page button press (does nothing, just shows current page).
-    """
-    await callback.answer("You are currently viewing this page")
-
-
 @router.callback_query()
 async def unhandled_callback(callback: CallbackQuery) -> None:
     """
